@@ -11,6 +11,7 @@ import Button from '@material-ui/core/Button'
 import InputMask from 'react-input-mask'
 import axios from 'axios'
 
+// variáveis de estilo
 const useStyles = makeStyles(theme => ({
     h1: {
         marginBottom: '42px'
@@ -39,6 +40,7 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
+// formatação de campos com máscara
 const formatChars = {
     'A': '[A-Za-z]',
     '0': '[0-9]',
@@ -51,6 +53,7 @@ export default function ClienteForm() {
     
     const classes = useStyles()
 
+    // hooks de estado
     const [cliente, setCliente] = useState({
         id: null,
         nome: '',
@@ -89,6 +92,7 @@ export default function ClienteForm() {
         }
     }, [])
 
+    // método get com axios
     async function getData(id) {
         try {
             let response = await axios.get(`https://api.faustocintra.com.br/clientes/${id}`)
@@ -103,62 +107,7 @@ export default function ClienteForm() {
         }
     }
 
-    function handleInputChange(event, property) {
-
-        if(event.target.id) property = event.target.id
-    
-        if(
-            property === 'rg' ||
-            property === 'num_imovel'
-        ) {
-          setCliente({...cliente, [property]: event.target.value.toUpperCase()
-            // nao aceita o primeiro caractere como espaço
-            .replace(/^\s+/,'')})
-        }
-
-        else if(
-            property === 'nome' || 
-            property === 'municipio'
-        ) {
-            setCliente({...cliente, [property]: event.target.value.toLowerCase()
-                // nao aceita caracteres especiais e nem números
-                .replace(/["'~`!@#$%^&()_={}[\]:;,.<>+/?-]+|\d+|^\s+$/g, '')
-                // primeira letra de cada palavra maiúscula
-                .replace(/(?:^|\s)\S/g, (value) => {
-                    return value.toUpperCase()
-                })
-            }) 
-        }
-        else if(
-            property === 'logradouro' || 
-            property === 'bairro'
-        ) {
-            setCliente({...cliente, [property]: event.target.value.toLowerCase()
-                // nao aceita caracteres especiais, porem aceita números
-                .replace(/["'~`!@#$%^&()_={}[\]:;,.<>+/?-]+|^\s+$/g, '')
-                // primeira letra de cada palavra maiúscula
-                .replace(/(?:^|\s)\S/g, (value) => {
-                    return value.toUpperCase()
-                })
-            }) 
-        }
-        else if(property === 'complemento') {
-            setCliente({...cliente, [property]: event.target.value
-                // nao aceita caracteres especiais, porem aceita números
-                .replace(/["'~`!@#$%^&()_={}[\]:;,.<>+/?-]+|^\s+$/g, '')
-                // primeira letra da primeira palavra maiúscula
-                .replace(/^\w/, (value) => {
-                // .replace(/(?:^|\s)\S/g, (value) => {
-                return value.toUpperCase()
-                })
-            }) 
-        }
-        else {
-          setCliente({...cliente, [property]: event.target.value})
-        }
-        setIsModified(true)
-    }
-
+    // método post com axios
     async function saveData() {
         try {
             setBtnSendState({disabled: true, label: 'Enviando...'})
@@ -182,6 +131,64 @@ export default function ClienteForm() {
         setBtnSendState({disabled: false, label: 'Enviar'})
     }
 
+    // manipulação de eventos nos inputs
+    function handleInputChange(event, property) {
+
+        if(event.target.id) property = event.target.id
+
+        if(
+            property === 'rg' ||
+            property === 'num_imovel'
+        ) {
+          setCliente({...cliente, [property]: event.target.value.toUpperCase()
+            // nao aceita o primeiro caractere como espaço
+            .replace(/^\s+/,'')})
+        }
+
+        else if(
+            property === 'nome' ||
+            property === 'municipio'
+        ) {
+            setCliente({...cliente, [property]: event.target.value.toLowerCase()
+                // nao aceita caracteres especiais e nem números
+                .replace(/["'~`!@#$%^&()_={}[\]:;,.<>+/?-]+|\d+|^\s+$/g, '')
+                // primeira letra de cada palavra maiúscula
+                .replace(/(?:^|\s)\S/g, (value) => {
+                    return value.toUpperCase()
+                })
+            })
+        }
+        else if(
+            property === 'logradouro' ||
+            property === 'bairro'
+        ) {
+            setCliente({...cliente, [property]: event.target.value.toLowerCase()
+                // nao aceita caracteres especiais, porem aceita números
+                .replace(/["'~`!@#$%^&()_={}[\]:;,.<>+/?-]+|^\s+$/g, '')
+                // primeira letra de cada palavra maiúscula
+                .replace(/(?:^|\s)\S/g, (value) => {
+                    return value.toUpperCase()
+                })
+            })
+        }
+        else if(property === 'complemento') {
+            setCliente({...cliente, [property]: event.target.value
+                // nao aceita caracteres especiais, porem aceita números
+                .replace(/["'~`!@#$%^&()_={}[\]:;,.<>+/?-]+|^\s+$/g, '')
+                // primeira letra da primeira palavra maiúscula
+                .replace(/^\w/, (value) => {
+                // .replace(/(?:^|\s)\S/g, (value) => {
+                return value.toUpperCase()
+                })
+            })
+        }
+        else {
+          setCliente({...cliente, [property]: event.target.value})
+        }
+        setIsModified(true)
+    }
+
+
     function handleSubmit(event) {
         event.preventDefault()
         saveData()
@@ -191,6 +198,7 @@ export default function ClienteForm() {
         return <MuiAlert elevation={6} variant="filled" {...props} />;
     }
 
+    // manipulação de eventos da snackbar
     function handleSnackClose(event, reason) {
         if(reason === 'clickaway') return
         setSnackState({...snackState, open: false})
@@ -204,6 +212,7 @@ export default function ClienteForm() {
         if(result) history.push('/list')
     }
 
+    // manipulação de eventos do botão voltar
     function handleGoBack() {
         if(isModified) setDialogOpen(true)
         else history.push('/list')

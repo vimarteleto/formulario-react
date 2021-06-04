@@ -10,7 +10,6 @@ export default function ConfirmDialog( {title = 'Confirmar', isOpen = false, onC
 
 
   const handleClose = (result) => {
-      // Só vai chamar a função se a prop correspondente estiver sido passada
     if(onClose) onClose(result)
   };
 

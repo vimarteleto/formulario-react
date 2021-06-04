@@ -15,6 +15,7 @@ import Button from '@material-ui/core/Button'
 import AddIcon from '@material-ui/icons/Add'
 import axios from 'axios'
 
+// variáveis de estilo
 const useStyles = makeStyles(theme => ({
     table: {
         minWidth: 650,
@@ -37,6 +38,7 @@ const useStyles = makeStyles(theme => ({
 export default function ClienteList() {
     const classes = useStyles()
 
+    // hooks de estado
     const [clientes, setClientes] = useState([])
     const [dialogOpen, setDialogOpen] = useState(false)
     const [deletable, setDeletable] = useState()
@@ -53,6 +55,7 @@ export default function ClienteList() {
         setTimeout(() => getData(), 100)
     }, [])
 
+    // método get com axios
     async function getData() {
         try {
             let response = await axios.get('https://api.faustocintra.com.br/clientes')
@@ -67,6 +70,7 @@ export default function ClienteList() {
         }
     }
 
+    // método delete com axios
     async function deleteItem() {
         try {
             await axios.delete(`https://api.faustocintra.com.br/clientes/${deletable}`)
@@ -87,6 +91,7 @@ export default function ClienteList() {
         if(result) deleteItem()
     }
 
+    // manipulação de eventos do botão excluir
     function handleDelete(id) {
         setDeletable(id)
         setDialogOpen(true)
@@ -102,6 +107,7 @@ export default function ClienteList() {
         return <MuiAlert elevation={6} variant="filled" {...props} />;
     }
 
+    // construção da tabela
     const columns: GridColDef[] = [
         {
             field: 'id',
