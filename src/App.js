@@ -1,13 +1,13 @@
 import './App.css';
 import TopBar from './ui/TopBar.js'
 import FooterBar from './ui/FooterBar.js'
-import { createMuiTheme, ThemeProvider, makeStyles } from '@material-ui/core/styles'
-import { Box } from '@material-ui/core'
-import { BrowserRouter, Route, Switch } from 'react-router-dom'
-import blue from '@material-ui/core/colors/blue'
-import yellow from '@material-ui/core/colors/yellow'
 import ClienteList from './routed/ClienteList.js'
 import ClienteForm from './routed/ClienteForm.js'
+import { BrowserRouter, Route, Switch } from 'react-router-dom'
+import { Box } from '@material-ui/core'
+import { createMuiTheme, ThemeProvider, makeStyles } from '@material-ui/core/styles'
+import blue from '@material-ui/core/colors/blue'
+import yellow from '@material-ui/core/colors/yellow'
 
 const theme = createMuiTheme({
 	palette: {
@@ -48,9 +48,12 @@ function Main() {
 						<Route path="/new">
 							<ClienteForm />
 						</Route>
+						<Route path="/edit/:id">
+							<ClienteForm />
+						</Route>
 					</Switch>
 				</Box>
-				<FooterBar />				
+				<FooterBar />
 			</BrowserRouter>
 		</Box>
 	)

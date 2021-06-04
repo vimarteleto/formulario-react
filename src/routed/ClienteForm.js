@@ -1,14 +1,16 @@
-import { useState } from 'react'
+import {useEffect, useState} from 'react'
 import { makeStyles } from '@material-ui/core/styles'
-import { useHistory } from 'react-router-dom'
-import InputMask from 'react-input-mask'
+import { useHistory, useParams } from 'react-router-dom'
 import TextField from '@material-ui/core/TextField'
+import MuiAlert from '@material-ui/lab/Alert';
+import ConfirmDialog from '../ui/ConfirmDialog'
+import Snackbar from '@material-ui/core/Snackbar';
 import MenuItem from '@material-ui/core/MenuItem'
 import Toolbar from '@material-ui/core/Toolbar'
 import Button from '@material-ui/core/Button'
+import InputMask from 'react-input-mask'
 import axios from 'axios'
 
-// classes de estilo
 const useStyles = makeStyles(theme => ({
     h1: {
         marginBottom: '42px'
@@ -37,13 +39,11 @@ const useStyles = makeStyles(theme => ({
     }
 }))
 
-// classes de entrada para a máscara do campo cpf e telefone
 const formatChars = {
     'A': '[A-Za-z]',
     '0': '[0-9]',
     '#': '[0-9A-Ja-j]'
 }
-
 const cpfMask = '000.000.000-00'
 const telMask = '(00) 00000-0000'
 
@@ -66,16 +66,54 @@ export default function ClienteForm() {
         email: ''
     })
 
+    const [snackState, setSnackState] = useState({
+        open: false,
+        severity: 'success',
+        message: 'Registro salvo com sucesso'
+    })
+
+    const [btnSendState, setBtnSendState] = useState({
+        disabled: false,
+        label: 'Enviar'
+    })
+
+    const [dialogOpen, setDialogOpen] = useState(false)
+    const [isModified, setIsModified] = useState(false)
+
     const history = useHistory()
+    const params = useParams()
+
+    useEffect(() => {
+        if(params.id) {
+            getData(params.id)
+        }
+    }, [])
+
+    async function getData(id) {
+        try {
+            let response = await axios.get(`https://api.faustocintra.com.br/clientes/${id}`)
+            setCliente(response.data)
+        }
+        catch(error) {
+            setSnackState({
+                open: true,
+                severity: 'error',
+                message: 'Não foi possível carregar os dados para edição.'
+            })
+        }
+    }
 
     function handleInputChange(event, property) {
-    
-        // Se houver id no event.target, ele será o nome da propriedade
-        // senão, usaremos o valor do segundo parâmetro
+
         if(event.target.id) property = event.target.id
     
-        if(property === 'rg' || property === 'num_imovel') {
-          setCliente({...cliente, [property]: event.target.value.toUpperCase()}) 
+        if(
+            property === 'rg' ||
+            property === 'num_imovel'
+        ) {
+          setCliente({...cliente, [property]: event.target.value.toUpperCase()
+            // nao aceita o primeiro caractere como espaço
+            .replace(/^\s+/,'')})
         }
 
         else if(
@@ -87,13 +125,12 @@ export default function ClienteForm() {
                 .replace(/["'~`!@#$%^&()_={}[\]:;,.<>+/?-]+|\d+|^\s+$/g, '')
                 // primeira letra de cada palavra maiúscula
                 .replace(/(?:^|\s)\S/g, (value) => {
-                return value.toUpperCase()
+                    return value.toUpperCase()
                 })
             }) 
         }
         else if(
             property === 'logradouro' || 
-            // property === 'complemento' ||
             property === 'bairro'
         ) {
             setCliente({...cliente, [property]: event.target.value.toLowerCase()
@@ -101,7 +138,7 @@ export default function ClienteForm() {
                 .replace(/["'~`!@#$%^&()_={}[\]:;,.<>+/?-]+|^\s+$/g, '')
                 // primeira letra de cada palavra maiúscula
                 .replace(/(?:^|\s)\S/g, (value) => {
-                return value.toUpperCase()
+                    return value.toUpperCase()
                 })
             }) 
         }
@@ -117,21 +154,32 @@ export default function ClienteForm() {
             }) 
         }
         else {
-             // Quando o nome de uma propriedade de um objeto aparece entre [],
-             // isso se chama "propriedade calculada". O nome da propriedade vai
-             // corresponder à avaliação da expressão entre os colchetes
           setCliente({...cliente, [property]: event.target.value})
         }
+        setIsModified(true)
     }
 
     async function saveData() {
         try {
-            await axios.post('https://api.faustocintra.com.br/clientes', cliente)
-            alert('Dados salvos com sucesso!')
+            setBtnSendState({disabled: true, label: 'Enviando...'})
+
+            if(params.id) await axios.put(`https://api.faustocintra.com.br/clientes/${params.id}`, cliente)
+            else await axios.post('https://api.faustocintra.com.br/clientes', cliente)
+
+            setSnackState({
+                open: true,
+                severity: 'success',
+                message: 'Registro salvo com sucesso!'
+            })
         }
         catch(error) {
-            alert('ERRO: ' + error.message)
+            setSnackState({
+                open: true,
+                severity: 'error',
+                message: 'ERRO: ' + error.message
+            })
         }
+        setBtnSendState({disabled: false, label: 'Enviar'})
     }
 
     function handleSubmit(event) {
@@ -139,35 +187,131 @@ export default function ClienteForm() {
         saveData()
     }
 
+    function Alert(props) {
+        return <MuiAlert elevation={6} variant="filled" {...props} />;
+    }
+
+    function handleSnackClose(event, reason) {
+        if(reason === 'clickaway') return
+        setSnackState({...snackState, open: false})
+
+        history.push('/list')
+    }
+
+    function handleDialogClose(result) {
+        setDialogOpen(false)
+
+        if(result) history.push('/list')
+    }
+
+    function handleGoBack() {
+        if(isModified) setDialogOpen(true)
+        else history.push('/list')
+    }
+
     return (
         <>
+            <ConfirmDialog isOpen={dialogOpen} onClose={handleDialogClose}>
+                Há dados não salvos. Deseja realmente voltar?
+            </ConfirmDialog>
+
+            <Snackbar open={snackState.open} autoHideDuration={6000} onClose={handleSnackClose}>
+                <Alert onClose={handleSnackClose} severity={snackState.severity}>
+                    {snackState.message}
+                </Alert>
+            </Snackbar>
+
             <Toolbar className={classes.toolbar}>
                 <h1>Novo cadastro</h1>
             </Toolbar>
             <form className={classes.form} onSubmit={handleSubmit}>
-                <TextField id="nome" label="Nome" required
-                variant="filled" value={cliente.nome} onChange={handleInputChange} fullWidth />
-
-                <InputMask id="cpf" formatChars={formatChars} mask={cpfMask} value={cliente.cpf} onChange={event => handleInputChange(event, 'cpf')} >
-                {() => <TextField label="CPF" variant="filled" fullWidth required />}
+                <TextField
+                    id="nome"
+                    label="Nome"
+                    fullWidth
+                    required
+                    variant="filled"
+                    value={cliente.nome}
+                    inputProps={{ maxLength: 100 }}
+                    onChange={handleInputChange}
+                />
+                <InputMask
+                    id="cpf"
+                    formatChars={formatChars}
+                    mask={cpfMask}
+                    value={cliente.cpf}
+                    onChange={event => handleInputChange(event, 'cpf')}
+                >
+                    {() => <TextField label="CPF" variant="filled" required fullWidth/>}
                 </InputMask>
-
-                <TextField id="rg" label="RG" type="text" maxLength={20} required
-                variant="filled" value={cliente.rg} onChange={handleInputChange} fullWidth />
-                <TextField id="logradouro" label="Logradouro" required
-                variant="filled" value={cliente.logradouro} onChange={handleInputChange} fullWidth />
-                <TextField id="num_imovel" label="Número" required
-                variant="filled" value={cliente.num_imovel} onChange={handleInputChange} fullWidth />
-                <TextField id="complemento" label="Complemento" 
-                variant="filled" value={cliente.complemento} onChange={handleInputChange} fullWidth />
-                <TextField id="bairro" label="Bairro" required
-                variant="filled" value={cliente.bairro} onChange={handleInputChange} fullWidth />
-                <TextField id="municipio" label="Município" required
-                variant="filled" value={cliente.municipio} onChange={handleInputChange} fullWidth />
-                
-
-                <TextField id="uf" label="UF" required
-                variant="filled" value={cliente.uf} onChange={event => handleInputChange(event, 'uf')} select fullWidth >
+                <TextField
+                    id="rg"
+                    label="RG"
+                    type="text"
+                    fullWidth
+                    required
+                    variant="filled" value={cliente.rg}
+                    inputProps={{ maxLength: 20 }}
+                    onChange={handleInputChange}
+                />
+                <TextField
+                    id="logradouro"
+                    label="Logradouro"
+                    fullWidth
+                    required
+                    variant="filled"
+                    value={cliente.logradouro}
+                    inputProps={{ maxLength: 100 }}
+                    onChange={handleInputChange}
+                />
+                <TextField
+                    id="num_imovel"
+                    label="Número"
+                    fullWidth
+                    required
+                    variant="filled"
+                    value={cliente.num_imovel}
+                    inputProps={{ maxLength: 10 }}
+                    onChange={handleInputChange}
+                />
+                <TextField
+                    id="complemento"
+                    label="Complemento"
+                    variant="filled"
+                    fullWidth
+                    value={cliente.complemento}
+                    inputProps={{ maxLength: 30 }}
+                    onChange={handleInputChange}
+                />
+                <TextField
+                    id="bairro"
+                    label="Bairro"
+                    fullWidth
+                    required
+                    variant="filled"
+                    value={cliente.bairro}
+                    inputProps={{ maxLength: 50 }}
+                    onChange={handleInputChange}
+                />
+                <TextField
+                    id="municipio"
+                    label="Município"
+                    fullWidth
+                    required
+                    variant="filled"
+                    value={cliente.municipio}
+                    inputProps={{ maxLength: 50 }}
+                    onChange={handleInputChange}
+                />
+                <TextField
+                    id="uf" label="UF"
+                    fullWidth
+                    required
+                    select
+                    variant="filled"
+                    value={cliente.uf}
+                    onChange={event => handleInputChange(event, 'uf')}
+                >
                     <MenuItem value='AC'>AC</MenuItem>
                     <MenuItem value='AL'>AL</MenuItem>
                     <MenuItem value='AP'>AP</MenuItem>
@@ -196,24 +340,45 @@ export default function ClienteForm() {
                     <MenuItem value='SE'>SE</MenuItem>
                     <MenuItem value='TO'>TO</MenuItem>
                 </TextField>
-
-                <InputMask id="telefone" formatChars={formatChars} mask={telMask} value={cliente.telefone} onChange={event => handleInputChange(event, 'telefone')} >
-                {() => <TextField label="Telefone" variant="filled" fullWidth required />}
+                <InputMask
+                    id="telefone"
+                    formatChars={formatChars}
+                    mask={telMask}
+                    value={cliente.telefone}
+                    onChange={event => handleInputChange(event, 'telefone')}
+                >
+                    {() => <TextField label="Telefone" variant="filled" fullWidth required />}
                 </InputMask>
-
-                <TextField id="email" label="Email" type="email" required
-                variant="filled" value={cliente.email} onChange={handleInputChange} fullWidth />
-
+                <TextField
+                    id="email"
+                    label="Email"
+                    type="email"
+                    fullWidth
+                    required
+                    variant="filled"
+                    value={cliente.email}
+                    inputProps={{ maxLength: 100 }}
+                    onChange={handleInputChange}
+                />
 
                 <Toolbar className={classes.toolbar}>
-                    <Button variant="contained" color="primary" type="submit">Enviar</Button>
-                    <Button variant="outlined" onClick={() => history.push('/list')}>Voltar</Button>                    
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        type="submit"
+                        disabled={btnSendState.disabled}
+                    >
+                        {btnSendState.label}
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        onClick={handleGoBack}
+                    >
+                        Voltar
+                    </Button>
                 </Toolbar>
 
             </form>
-            {/* <div>{JSON.stringify(cliente)}
-                <br />
-            </div> */}
         </>
     )
 }

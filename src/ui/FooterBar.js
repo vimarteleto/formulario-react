@@ -13,7 +13,8 @@ const useStyles = makeStyles((theme) => ({
         minHeight: '42px',
         bottom: 0,
         width: '100%',
-        position: 'fixed',        
+        position: 'fixed',
+        zIndex: 10
     },
     link: {
         color: theme.palette.secondary.light,
