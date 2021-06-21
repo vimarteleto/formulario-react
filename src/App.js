@@ -43,16 +43,16 @@ function Main() {
 				<TopBar />
 				<Box id="routed" className={classes.routed}>
 					<Switch>
-						<Route exact path="/">
+						<Route exact path="/formulario-react/">
 							<HomePage />
 						</Route>
-						<Route path="/list">
+						<Route path="/formulario-react/list">
 							<ClienteList />
 						</Route>
-						<Route path="/new">
+						<Route path="/formulario-react/new">
 							<ClienteForm />
 						</Route>
-						<Route path="/edit/:id">
+						<Route path="/formulario-react/edit/:id">
 							<ClienteForm />
 						</Route>
 					</Switch>

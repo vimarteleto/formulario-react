@@ -244,7 +244,7 @@ export default function ClienteList() {
             <Toolbar className={classes.toolbar}>
                 <h1>Listagem de clientes</h1>
                 <Button color="primary" variant="contained" size="large"
-                        startIcon={<AddIcon />} onClick={() => history.push('/new')}>
+                        startIcon={<AddIcon />} onClick={() => history.push('/formulario-react/new')}>
                     Novo Cadastro
                 </Button>
             </Toolbar>

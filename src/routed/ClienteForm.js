@@ -203,19 +203,19 @@ export default function ClienteForm() {
         if(reason === 'clickaway') return
         setSnackState({...snackState, open: false})
 
-        history.push('/list')
+        history.push('/formulario-react/list')
     }
 
     function handleDialogClose(result) {
         setDialogOpen(false)
 
-        if(result) history.push('/list')
+        if(result) history.push('/formulario-react/list')
     }
 
     // manipulação de eventos do botão voltar
     function handleGoBack() {
         if(isModified) setDialogOpen(true)
-        else history.push('/list')
+        else history.push('/formulario-react/list')
     }
 
     return (
@@ -353,7 +353,7 @@ export default function ClienteForm() {
                     id="telefone"
                     formatChars={formatChars}
                     mask={telMask}
-                    value={cliente.telefones}
+                    value={cliente.telefone}
                     onChange={event => handleInputChange(event, 'telefone')}
                 >
                     {() => <TextField label="Telefone" variant="filled" fullWidth required />}

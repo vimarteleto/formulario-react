@@ -53,15 +53,15 @@ export default function MainMenu() {
         >
             <MenuItem
                 onClick={handleClose}>
-                <Link className={classes.menuLink} to="/">Home</Link>
+                <Link className={classes.menuLink} to="/formulario-react/">Home</Link>
             </MenuItem>
             <MenuItem
                 onClick={handleClose}>
-                <Link className={classes.menuLink} to="/list">Listagem de clientes</Link>
+                <Link className={classes.menuLink} to="/formulario-react/list">Listagem de clientes</Link>
             </MenuItem>
             <MenuItem                 
                 onClick={handleClose}>
-                    <Link className={classes.menuLink} to="/new">Cadastrar novo cliente</Link>
+                    <Link className={classes.menuLink} to="/formulario-react/new">Cadastrar novo cliente</Link>
             </MenuItem>
         </Menu>
         </>
