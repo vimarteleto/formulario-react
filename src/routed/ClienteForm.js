@@ -353,7 +353,7 @@ export default function ClienteForm() {
                     id="telefone"
                     formatChars={formatChars}
                     mask={telMask}
-                    value={cliente.telefone}
+                    value={cliente.telefones}
                     onChange={event => handleInputChange(event, 'telefone')}
                 >
                     {() => <TextField label="Telefone" variant="filled" fullWidth required />}
