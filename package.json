@@ -2,7 +2,7 @@
   "name": "trabalho-t2",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://vimarteleto.github.io/formulario-react",
+  "homepage": "https://vimarteleto.github.io/formulario-react/",
   "dependencies": {
     "@material-ui/core": "^4.11.4",
     "@material-ui/data-grid": "^4.0.0-alpha.29",

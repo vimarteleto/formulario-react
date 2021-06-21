@@ -53,6 +53,10 @@ export default function MainMenu() {
         >
             <MenuItem
                 onClick={handleClose}>
+                <Link className={classes.menuLink} to="/">Home</Link>
+            </MenuItem>
+            <MenuItem
+                onClick={handleClose}>
                 <Link className={classes.menuLink} to="/list">Listagem de clientes</Link>
             </MenuItem>
             <MenuItem                 

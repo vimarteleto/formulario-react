@@ -3,6 +3,7 @@ import TopBar from './ui/TopBar.js'
 import FooterBar from './ui/FooterBar.js'
 import ClienteList from './routed/ClienteList.js'
 import ClienteForm from './routed/ClienteForm.js'
+import HomePage from './routed/HomePage';
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import { Box } from '@material-ui/core'
 import { createMuiTheme, ThemeProvider, makeStyles } from '@material-ui/core/styles'
@@ -42,6 +43,9 @@ function Main() {
 				<TopBar />
 				<Box id="routed" className={classes.routed}>
 					<Switch>
+						<Route exact path="/">
+							<HomePage />
+						</Route>
 						<Route path="/list">
 							<ClienteList />
 						</Route>
